@@ -1,37 +1,37 @@
 version: "3.3"
 services:
-  mysql:
+  mysql-server:
     restart: always
     container_name: mysql-wedding-auth
     image: "mysql:8.0.20"
-    environment: 
-      MYSQL_DATABASE: auth-server-prod
+    environment:
       MYSQL_ROOT_PASSWORD: 123456
       MYSQL_ROOT_HOST: '%'
-    volumes: 
-      - type: bind
-        source: ./mysql-wedding-auth
-        target: /var/lib/mysql
-    ports: 
-      - "3307:3306"
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+      - ./mysql:/docker-entrypoint-initdb.d
+    networks:
+      - WEDDING_NETWORK
     healthcheck:
       test: "/usr/bin/mysql --user=root --password=123456 --execute \"SHOW DATABASES;\""
       interval: 2s
       timeout: 20s
       retries: 10
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
-  
+
   wedding-auth-server:
     container_name: wedding-auth-server
-    image: "docker.pkg.github.com/kamranghiasvand/authentication-server/authentication-server:1.0.0"
-    environment: 
-      MYSQL_DATABASE: auth-server-prod
-      MYSQL_PASSWORD: 123456
-      MYSQL_USERNAME: root
-    volumes: 
-      - type: bind
-        source: ./auth-server
-        target: /app/auth-server
-    ports: 
+    image: "docker.pkg.github.com/kamranghiasvand/authentication-server/authentication-server:434dcef4780e"
+    depends_on:
+      - mysql-server
+    volumes:
+      - ./auth-server:/app/config
+    networks:
+      - WEDDING_NETWORK
+    ports:
       - "8081:8081"
+
+networks:
+  WEDDING_NETWORK:
+    driver: bridge
 
