@@ -1,15 +1,14 @@
 version: "3.3"
 services:
   mysql-server:
-    restart: always
     container_name: mysql-wedding-auth
     image: "mysql:8.0.20"
     environment:
       MYSQL_ROOT_PASSWORD: 123456
       MYSQL_ROOT_HOST: '%'
     volumes:
-      - ./mysql-data:/var/lib/mysql
-      - ./mysql:/docker-entrypoint-initdb.d
+      - ./tmp/mysql-data:/var/lib/mysql
+      - ./mysql-config:/docker-entrypoint-initdb.d
     networks:
       - WEDDING_NETWORK
     healthcheck:
@@ -21,13 +20,17 @@ services:
 
   wedding-auth-server:
     container_name: wedding-auth-server
-    image: "docker.pkg.github.com/kamranghiasvand/authentication-server/authentication-server:434dcef4780e"
+    restart: unless-stopped
+    image: docker.pkg.github.com/kamranghiasvand/authentication-server/authentication-server
+    environment:
+      SERVER_PORT: 8081
     depends_on:
       - mysql-server
     volumes:
       - ./auth-server:/app/config
     networks:
       - WEDDING_NETWORK
+    command: --spring.datasource.hikari.initializationFailTimeout=20000
     ports:
       - "8081:8081"
 
