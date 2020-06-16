@@ -30,7 +30,10 @@ services:
       - ./auth-server:/app/config
     networks:
       - WEDDING_NETWORK
-    command: --spring.datasource.hikari.initializationFailTimeout=20000
+    command: "\
+    --logging.level.root=info \
+    --spring.datasource.hikari.initializationFailTimeout=15000 \
+    --spring.datasource.url=jdbc:mysql://mysql-server:3306/auth_server_prod?useUnicode=true&characterEncoding=UTF-8"
     ports:
       - "8081:8081"
 
