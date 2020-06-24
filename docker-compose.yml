@@ -16,7 +16,10 @@ services:
       interval: 2s
       timeout: 20s
       retries: 10
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
+    command: "\
+    --character-set-server=utf8mb4 \
+    --collation-server=utf8mb4_unicode_ci \
+    --default-authentication-plugin=mysql_native_password"
 
   wedding-auth-server:
     container_name: wedding-auth-server
